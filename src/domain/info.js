@@ -1,7 +1,8 @@
 import { getUniversitiesFromDb, getAllCoursesFromDb } from "../repo/info";
+
+// extract all universities registered in database
 export const getAllUniversities = () => {
   return getUniversitiesFromDb().then((universities) => {
-    console.log(universities);
     if (universities == null) return [];
 
     return universities.map((university) => ({
@@ -11,6 +12,7 @@ export const getAllUniversities = () => {
   });
 };
 
+// all courses of a particular univ
 export const getAllCourses = (university) => {
   return getAllCoursesFromDb(university).then((courses) => {
     if (courses == null) return [];

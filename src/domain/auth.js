@@ -16,7 +16,8 @@ export const signUp = ({
   courses,
 }) => {
   return bcrypt.hash(password, 10).then((hash) => {
-    password = hash;
+    password = hash; // set hash as password
+    // store promise
     const signUpPromise =
       accountType === "STUDENT"
         ? signUpStudent({
@@ -41,11 +42,13 @@ export const signUp = ({
 
     return signUpPromise.then((response) => {
       if (response === null)
+        // if signup failed somehow
         return { message: "There was some error, please try again later" };
+      // create jwt token from id, 15 min expiration
       const token = jwt.sign(response, process.env.JWT_SECRET, {
         expiresIn: 15 * 60,
       });
-      return { token };
+      return { token }; // {'token': token}
     });
   });
 };

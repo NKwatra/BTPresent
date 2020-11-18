@@ -4,11 +4,12 @@ import passport from "passport";
 const router = Router();
 
 router.post("/login", loginMiddleware, (req, res) => {
-  console.log(req.user);
   login(req.user).then((response) => res.json(response));
 });
 
+// '/auth/signup' -> match
 router.post("/signup", (req, res) => {
+  // extract user data
   const {
     accountType,
     fName,
@@ -22,6 +23,7 @@ router.post("/signup", (req, res) => {
     courses,
   } = req.body;
 
+  // register user into the db
   signUp({
     accountType,
     fName,
@@ -34,15 +36,18 @@ router.post("/signup", (req, res) => {
     macAddress,
     courses,
   }).then((resp) => {
-    res.json(resp);
+    res.json(resp); // API token is returned
   });
 });
 
+// '/auth/check' -> match
 router.post(
   "/check",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    res.json(true);
+    // if not reached here, passport automatically tells that
+    // unauthenticated
+    res.json(true); // tell user that he/she is authenticated
   }
 );
 

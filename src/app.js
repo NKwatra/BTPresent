@@ -8,12 +8,12 @@ import infoRouter from "./router/infoRouter";
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // used to parse json body from requests
 app.use(passport.initialize());
-app.use("/auth", authRouter);
-app.use("/info", infoRouter);
+app.use("/auth", authRouter); // '/auth/*' -> authRouter
+app.use("/info", infoRouter); // same as auth, '/info/*'
 
-initialiseStrategy(passport);
+initialiseStrategy(passport); // initiliaing passport strategies
 
 const PORT = process.env.PORT || 3000;
 mongoose.connect("mongodb://localhost:27017/btpresent", {

@@ -1,5 +1,7 @@
 import { Student, Teacher } from "./models";
 import mongoose from "mongoose";
+
+// function to add new student to database
 export const signUpStudent = ({
   fName,
   lName,
@@ -30,6 +32,7 @@ export const signUpStudent = ({
     });
 };
 
+// function to add new teacher to db
 export const signUpTeacher = ({
   fName,
   lName,
@@ -52,6 +55,7 @@ export const signUpTeacher = ({
     .catch((err) => null);
 };
 
+// function to search by a unique id and then return user
 export const searchById = (id) => {
   const searchStudent = Student.findById(id)
     .then((student) => student)
@@ -83,17 +87,17 @@ export const searchByUsername = (username, university, address) => {
     .catch(() => null);
 
   return Promise.all([searchStudent, searchTeacher]).then((results) => {
-    if (!results[0] && !results[1]) return [];
+    if (results[0].length == 0 && results[1].length == 0) return [];
 
     /*
       If it is a student user, update it's MAC address in database 
     */
-    if (results[0]) {
-      console.log("update command called");
+    if (results[0].length > 0) {
       Student.findByIdAndUpdate(results[0][0]._id, {
         MACaddress: address,
       }).exec();
+      return results[0];
     }
-    return results[0] || results[1];
+    return results[1];
   });
 };
