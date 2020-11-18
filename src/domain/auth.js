@@ -1,6 +1,7 @@
 import { signUpStudent, signUpTeacher } from "../repo/auth";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import passport from "passport";
 
 export const signUp = ({
   accountType,
@@ -47,4 +48,37 @@ export const signUp = ({
       return { token };
     });
   });
+};
+
+/*
+    Function to send user an API token and courses of user
+    on successful login
+*/
+export const login = (user) => {
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: 15 * 60,
+  });
+
+  return user
+    .populate("courses", "courseName _id")
+    .execPopulate()
+    .then(() => {
+      return { selectedCourses: user.courses, token };
+    });
+};
+
+/* 
+    Middleware to send customised message in case
+    of login failure to user
+*/
+export const loginMiddleware = (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) return next(err);
+    if (!user) {
+      res.status(401).json({ message: info.message }).end();
+    } else {
+      req.user = user;
+      next();
+    }
+  })(req, res, next);
 };

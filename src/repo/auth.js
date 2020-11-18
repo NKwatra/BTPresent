@@ -1,4 +1,5 @@
 import { Student, Teacher } from "./models";
+import mongoose from "mongoose";
 export const signUpStudent = ({
   fName,
   lName,
@@ -62,6 +63,37 @@ export const searchById = (id) => {
 
   return Promise.all([searchStudent, searchTeacher]).then((results) => {
     if (results[0] == null && results[1] == null) return null;
+    return results[0] || results[1];
+  });
+};
+
+export const searchByUsername = (username, university, address) => {
+  const searchStudent = Student.find({
+    enrollmentNumber: username,
+    univID: mongoose.Types.ObjectId(university),
+  })
+    .then((student) => student)
+    .catch(() => null);
+
+  const searchTeacher = Teacher.find({
+    email: username,
+    univID: mongoose.Types.ObjectId(university),
+  })
+    .then((teacher) => teacher)
+    .catch(() => null);
+
+  return Promise.all([searchStudent, searchTeacher]).then((results) => {
+    if (!results[0] && !results[1]) return [];
+
+    /*
+      If it is a student user, update it's MAC address in database 
+    */
+    if (results[0]) {
+      console.log("update command called");
+      Student.findByIdAndUpdate(results[0][0]._id, {
+        MACaddress: address,
+      }).exec();
+    }
     return results[0] || results[1];
   });
 };

@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { signUp } from "../domain/auth";
+import { signUp, login, loginMiddleware } from "../domain/auth";
 import passport from "passport";
 const router = Router();
 
-router.post("/login", (req, res) => {
-  const { username, password } = req.body;
+router.post("/login", loginMiddleware, (req, res) => {
+  console.log(req.user);
+  login(req.user).then((response) => res.json(response));
 });
 
 router.post("/signup", (req, res) => {
