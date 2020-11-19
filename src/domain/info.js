@@ -33,7 +33,7 @@ export const getStudentList = (address) => {
       };
       students.studentPresent = studentList.map((student) => ({
           name : student.firstname + " " + student.lastname,
-          rollNo : student.enrollmentNumber,
+          roll : student.enrollmentNumber,
           id : student._id
       }));
       return students;
