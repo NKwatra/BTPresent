@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { University, Course } from "./models";
+import { University, Course, Student } from "./models";
 
 export const getUniversitiesFromDb = () => {
   return University.find({})
@@ -16,6 +16,16 @@ export const getAllCoursesFromDb = (university) => {
     .then((courses) => courses)
     .catch((err) => {
       console.log(err);
+      return null;
+    });
+};
+
+export const getStudentListFromDb = (address) => {
+  return Student.find( { MACaddress : { $in : address }})
+    .then((studentList) => {
+      return studentList;
+    })
+    .catch((err) => {
       return null;
     });
 };

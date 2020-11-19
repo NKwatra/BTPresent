@@ -1,4 +1,4 @@
-import { getUniversitiesFromDb, getAllCoursesFromDb } from "../repo/info";
+import { getUniversitiesFromDb, getAllCoursesFromDb, getStudentListFromDb } from "../repo/info";
 
 // extract all universities registered in database
 export const getAllUniversities = () => {
@@ -21,4 +21,22 @@ export const getAllCourses = (university) => {
       name: course.courseName,
     }));
   });
+};
+
+export const getStudentList = (address) => {
+  return getStudentListFromDb(address).then((studentList) => {
+    if (studentList == null || studentList.length == 0) 
+          return [];
+    else{
+      let students = {
+        universityID : studentList[0].univID,
+      };
+      students.studentPresent = studentList.map((student) => ({
+          name : student.firstname + " " + student.lastname,
+          rollNo : student.enrollmentNumber,
+          id : student._id
+      }));
+      return students;
+    }
+    });
 };

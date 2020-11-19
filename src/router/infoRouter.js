@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllUniversities, getAllCourses } from "../domain/info";
+import { getAllUniversities, getAllCourses , getStudentList } from "../domain/info";
 
 const router = Router();
 
@@ -14,5 +14,10 @@ router.get("/courses/:university", (req, res) => {
   const { university } = req.params;
   getAllCourses(university).then((courses) => res.json(courses));
 });
+
+router.post("/extract", (req, res) => {
+    const { address } = req.body;
+    getStudentList(address).then((students) => res.json(students));
+  });
 
 export default router;
