@@ -25,7 +25,7 @@ export const getAllCourses = (university) => {
 
 export const getStudentList = (address) => {
   return getStudentListFromDb(address).then((studentList) => {
-    if (studentList == null) 
+    if (studentList == null || studentList.length == 0) 
           return [];
     else{
       let students = {
