@@ -1,4 +1,11 @@
-import { getUniversitiesFromDb, getAllCoursesFromDb, getStudentListFromDb } from "../repo/info";
+import {
+  getUniversitiesFromDb,
+  getAllCoursesFromDb,
+  getStudentListFromDb,
+  extractStudentID,
+  insertStudentAttendance,
+  insertClassRecord,
+} from "../repo/info";
 
 // extract all universities registered in database
 export const getAllUniversities = () => {
@@ -25,18 +32,41 @@ export const getAllCourses = (university) => {
 
 export const getStudentList = (address) => {
   return getStudentListFromDb(address).then((studentList) => {
-    if (studentList == null || studentList.length == 0) 
-          return [];
-    else{
+    if (studentList == null || studentList.length == 0) return [];
+    else {
       let students = {
-        universityID : studentList[0].univID,
+        universityID: studentList[0].univID,
       };
       students.studentPresent = studentList.map((student) => ({
-          name : student.firstname + " " + student.lastname,
-          roll : student.enrollmentNumber,
-          id : student._id
+        name: student.firstname + " " + student.lastname,
+        roll: student.enrollmentNumber,
+        id: student._id,
       }));
       return students;
     }
-    });
+  });
+};
+
+export const addNewAttendance = (univID, students, courseID, teacherID) => {
+  let studenstWithoutId = students
+    .filter((student) => !student.hasOwnProperty("id"))
+    .map((student) => student.roll);
+  let studentsWithID = students
+    .filter((student) => student.hasOwnProperty("id"))
+    .map((student) => student.id);
+  const studentAttendancePromise = extractStudentID(
+    univID,
+    studenstWithoutId
+  ).then((students) => {
+    let ids = students.map((student) => student._id);
+    return insertStudentAttendance([...ids, ...studentsWithID], courseID).then(
+      (res) => res
+    );
+  });
+
+  const classRecordPromise = insertClassRecord(teacherID, courseID);
+
+  return Promise.all([studentAttendancePromise, classRecordPromise])
+    .then(() => true)
+    .catch(() => false);
 };

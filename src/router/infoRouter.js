@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { getAllUniversities, getAllCourses , getStudentList } from "../domain/info";
+import {
+  getAllUniversities,
+  getAllCourses,
+  getStudentList,
+  addNewAttendance,
+} from "../domain/info";
+import passport from "passport";
 
 const router = Router();
 
@@ -16,8 +22,20 @@ router.get("/courses/:university", (req, res) => {
 });
 
 router.post("/extract", (req, res) => {
-    const { address } = req.body;
-    getStudentList(address).then((students) => res.json(students));
-  });
+  const { address } = req.body;
+  getStudentList(address).then((students) => res.json(students));
+});
+
+router.post(
+  "/attendance/add",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { univID, students, courseID } = req.body;
+    const id = req.user._id;
+    addNewAttendance(univID, students, courseID, id).then((saved) =>
+      res.json({ saved })
+    );
+  }
+);
 
 export default router;
