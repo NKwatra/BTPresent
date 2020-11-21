@@ -1,4 +1,4 @@
-import { getUniversitiesFromDb, getAllCoursesFromDb, getStudentListFromDb } from "../repo/info";
+import { getUniversitiesFromDb, getAllCoursesFromDb, getStudentListFromDb , getStudentIDFromDB, storeStudentAttendanceInDB , storeTeacherAttendanceInDB} from "../repo/info";
 
 // extract all universities registered in database
 export const getAllUniversities = () => {
@@ -39,4 +39,29 @@ export const getStudentList = (address) => {
       return students;
     }
     });
+};
+
+export const storeAttendance = (univID, students, courseID , teacherID) => {
+    let roll = students.map((student) => student.roll );
+    return getStudentIDFromDB(univID, roll)
+    .then((Foundstudents) => {
+      let studentID = [];
+      Foundstudents.forEach((student) => {
+        console.log(student._id);
+        studentID.push(student._id);
+      });
+        return storeStudentAttendanceInDB(courseID , studentID);
+    })
+    .then((resp) => {
+      console.log("First input Successful " + resp);
+        return storeTeacherAttendanceInDB(courseID , teacherID);
+    })
+    .then((resp) => {
+      console.log("Second input Successful " + resp);
+      return true;
+    })
+    .catch((err) => {
+      console.log(err);
+      return false;
+    })
 };

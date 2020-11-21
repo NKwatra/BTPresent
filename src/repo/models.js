@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const universitySchema = new mongoose.Schema({
-  name: String,
+  name: String
 });
 
 const courseSchema = new mongoose.Schema({
@@ -9,7 +9,7 @@ const courseSchema = new mongoose.Schema({
   univID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "university",
-  },
+  }
 });
 
 const teacherSchema = new mongoose.Schema({
@@ -26,7 +26,7 @@ const teacherSchema = new mongoose.Schema({
   univID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "university",
-  },
+  }
 });
 
 const studentSchema = new mongoose.Schema({
@@ -46,7 +46,7 @@ const studentSchema = new mongoose.Schema({
   univID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "university",
-  },
+  }
 });
 
 const studentAttendanceSchema = new mongoose.Schema({
@@ -55,10 +55,12 @@ const studentAttendanceSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "course",
   },
-  studentID: {
+  studentID: [
+    {
     type: mongoose.Schema.Types.ObjectId,
     ref: "student",
-  },
+    },
+  ]
 });
 
 const teacherAttendanceSchema = new mongoose.Schema({
@@ -70,7 +72,7 @@ const teacherAttendanceSchema = new mongoose.Schema({
   teacherID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "teacher",
-  },
+  }
 });
 
 export const University = mongoose.model("university", universitySchema);
