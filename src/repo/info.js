@@ -51,3 +51,24 @@ export const insertStudentAttendance = (ids, courseId) => {
 export const insertClassRecord = (teacherID, course) => {
   return TeacherAttendance.create({ teacherID, course }).then(() => true);
 };
+
+export const getStudentAttendanceFromDB = ( courseID, studentID ) => {
+  return StudentAttendance.find( { 
+    course : mongoose.Types.ObjectId(courseID),
+    studentID : mongoose.Types.ObjectId(studentID), 
+  }).then((presentDays) => presentDays );
+};
+
+export const getAbsentRecordFromDB = ( courseID, studentID ) => {
+  return StudentAttendance.find( { 
+    course : mongoose.Types.ObjectId(courseID),
+    studentID : { $nin : [mongoose.Types.ObjectId(studentID)] }, 
+  }).then((absentDays) => absentDays );
+};
+
+export const getTeacherAttendanceFromDB = ( courseId, teacherID ) => {
+  return TeacherAttendance.find ({ 
+    course : mongoose.Types.ObjectId(courseID),
+    teacherID : mongoose.Types.ObjectId(teacherID),
+  }).then((attendance) => attendance );
+};

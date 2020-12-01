@@ -5,6 +5,9 @@ import {
   extractStudentID,
   insertStudentAttendance,
   insertClassRecord,
+  getAbsentRecordFromDB,
+  getStudentAttendanceFromDB,
+  getTeacherAttendanceFromDB
 } from "../repo/info";
 
 // extract all universities registered in database
@@ -69,4 +72,21 @@ export const addNewAttendance = (univID, students, courseID, teacherID) => {
   return Promise.all([studentAttendancePromise, classRecordPromise])
     .then(() => true)
     .catch(() => false);
+};
+
+export const getPreviousAttendance = (courseID , accountType , userID) => {
+    if(accountType === "STUDENT")
+    {
+      getStudentAttendanceFromDB(courseID , userID).then((presentDays) =>{
+        getAbsentRecordFromDB(courseID,userID).then((absentDays) => {
+
+      })
+    })
+    }
+    else
+    {
+      getTeacherAttendanceFromDB(courseID,userID).then((attendance) => {
+        return
+      })
+    } 
 };
