@@ -66,7 +66,7 @@ export const getAbsentRecordFromDB = ( courseID, studentID ) => {
   }).then((absentDays) => absentDays );
 };
 
-export const getTeacherAttendanceFromDB = ( courseId, teacherID ) => {
+export const getTeacherAttendanceFromDB = ( courseID, teacherID ) => {
   return TeacherAttendance.find ({ 
     course : mongoose.Types.ObjectId(courseID),
     teacherID : mongoose.Types.ObjectId(teacherID),

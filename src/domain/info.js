@@ -75,18 +75,108 @@ export const addNewAttendance = (univID, students, courseID, teacherID) => {
 };
 
 export const getPreviousAttendance = (courseID , accountType , userID) => {
+    let attendanceRecord = {};
     if(accountType === "STUDENT")
-    {
-      getStudentAttendanceFromDB(courseID , userID).then((presentDays) =>{
-        getAbsentRecordFromDB(courseID,userID).then((absentDays) => {
+    { 
+      return getStudentAttendanceFromDB(courseID , userID).then((presentDays) =>{
+        return getAbsentRecordFromDB(courseID,userID).then((absentDays) => {
+          // Forming of object to return start here
+          presentDays.forEach((day) => {
+            let year = day.lectureDate.getFullYear();
+            let month = (day.lectureDate.getMonth()) +1;
+            if(attendanceRecord.hasOwnProperty(year))
+            {
+                if(attendanceRecord[year].hasOwnProperty(month))
+                {
+                  attendanceRecord[year][month]["present"].push(day.lectureDate.getDate());
+                }
+                else{
+                  attendanceRecord[year][month] = {
+                  present : [day.lectureDate.getDate()],
+                  absent : [],
+                  }
+                }
+            }
+            else
+            {
+              attendanceRecord[year] = {
+                [month] : {
+                  present : [day.lectureDate.getDate()],
+                  absent : [],
+                }
+              }
+            }
+          })
 
+          absentDays.forEach((day) => {
+            const year = day.lectureDate.getFullYear();
+            const month = (day.lectureDate.getMonth()) +1;
+            if(attendanceRecord.hasOwnProperty(year))
+            {
+                if(attendanceRecord[year].hasOwnProperty(month))
+                {
+                  attendanceRecord[year][month]["absent"].push(day.lectureDate.getDate());
+                }
+                else{
+                  attendanceRecord[year][month] = {
+                  present : [],
+                  absent : [day.lectureDate.getDate()],
+                  }
+                }
+            }
+            else
+            {
+              attendanceRecord[year] = {
+                [month] : {
+                  present : [],
+                  absent : [day.lectureDate.getDate()],
+                }
+              }
+            }
+          })
+          console.log(attendanceRecord);
+          return attendanceRecord;
+          //ends here
+      }).catch((err) => {
+        console.log("Error in second student function " + err);
       })
+    }).catch((err) => {
+      console.log("Error in first student function " + err);
     })
     }
     else
     {
-      getTeacherAttendanceFromDB(courseID,userID).then((attendance) => {
-        return
+      return getTeacherAttendanceFromDB(courseID,userID).then((attendance) => {
+        attendance.forEach((day) => {
+          const year = day.lectureDate.getFullYear();
+          const month = (day.lectureDate.getMonth()) +1;
+          if(attendanceRecord.hasOwnProperty(year))
+          {
+              if(attendanceRecord[year].hasOwnProperty(month))
+              {
+                attendanceRecord[year][month]["present"].push(day.lectureDate.getDate());
+              }
+              else{
+                attendanceRecord[year][month] = {
+                present : [day.lectureDate.getDate()],
+                }
+              }
+          }
+          else
+          {
+            attendanceRecord[year] = {
+              [month] : {
+                present : [day.lectureDate.getDate()],
+              }
+            }
+          }
+        })
+        console.log(attendanceRecord);
+      return attendanceRecord;
+      }).catch((err) => {
+        console.log("Error in teacher function " + err);
       })
+      
     } 
+  //return attendanceRecord;
 };
