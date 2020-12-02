@@ -39,8 +39,9 @@ router.post(
   }
 );
 
-router.get("/attendance",(req,res) => {
-  const { courseID , accountType , userID } = req.query;
+router.get("/attendance", passport.authenticate("jwt", { session : false }), (req,res) => {
+  const { courseID , accountType } = req.query;
+  const userID = req.user._id;
   getPreviousAttendance( courseID , accountType , userID).then((previousAttendance) => {
     res.json(previousAttendance);
   });
