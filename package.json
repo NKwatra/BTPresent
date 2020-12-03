@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf lib/ && npx babel src/ --out-dir lib",
-    "start": "npm run build && node lib/app.js"
+    "start:dev": "npm run build && node lib/app.js",
+    "start": "node lib/app.js"
   },
   "author": "Mansi",
   "license": "ISC",
@@ -25,5 +26,8 @@
     "@babel/core": "^7.12.3",
     "@babel/preset-env": "^7.12.1",
     "rimraf": "^3.0.2"
+  },
+  "engines": {
+    "node": "12.x"
   }
 }
