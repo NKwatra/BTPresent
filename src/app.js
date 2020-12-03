@@ -16,7 +16,7 @@ app.use("/info", infoRouter); // same as auth, '/info/*'
 initialiseStrategy(passport); // initiliaing passport strategies
 
 const PORT = process.env.PORT || 3000;
-mongoose.connect("mongodb://localhost:27017/btpresent", {
+mongoose.connect(process.env.CLUSTER_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,

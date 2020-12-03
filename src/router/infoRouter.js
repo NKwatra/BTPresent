@@ -21,10 +21,14 @@ router.get("/courses/:university", (req, res) => {
   getAllCourses(university).then((courses) => res.json(courses));
 });
 
-router.post("/extract", (req, res) => {
-  const { address } = req.body;
-  getStudentList(address).then((students) => res.json(students));
-});
+router.post(
+  "/extract",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { address } = req.body;
+    getStudentList(address).then((students) => res.json(students));
+  }
+);
 
 router.post(
   "/attendance/add",
