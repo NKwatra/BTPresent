@@ -5,6 +5,9 @@ import {
   extractStudentID,
   insertStudentAttendance,
   insertClassRecord,
+  getAbsentRecordFromDB,
+  getStudentAttendanceFromDB,
+  getTeacherAttendanceFromDB
 } from "../repo/info";
 
 // extract all universities registered in database
@@ -69,4 +72,115 @@ export const addNewAttendance = (univID, students, courseID, teacherID) => {
   return Promise.all([studentAttendancePromise, classRecordPromise])
     .then(() => true)
     .catch(() => false);
+};
+
+export const getPreviousAttendance = (courseID , accountType , userID) => {
+    let attendanceRecord = {};
+    //Check for the account type
+    //if account type is student
+    if(accountType === "STUDENT")
+    { 
+      //fetch the days student was present
+      return getStudentAttendanceFromDB(courseID , userID).then((presentDays) =>{
+        //after successfully getting the present record fetch the days student was absent
+        return getAbsentRecordFromDB(courseID,userID).then((absentDays) => {
+          presentDays.forEach((day) => {
+            //Extract the year and month for each date the student was present
+            let year = day.lectureDate.getFullYear();
+            //Month is indexed with 0 i.e. January = 0, adding 1 to start indexing from 1
+            let month = (day.lectureDate.getMonth()) +1;
+            if(attendanceRecord.hasOwnProperty(year))
+            {
+                if(attendanceRecord[year].hasOwnProperty(month))
+                {
+                  attendanceRecord[year][month]["present"].push(day.lectureDate.getDate());
+                }
+                else{
+                  attendanceRecord[year][month] = {
+                  present : [day.lectureDate.getDate()],
+                  absent : [],
+                  }
+                }
+            }
+            else
+            {
+              attendanceRecord[year] = {
+                [month] : {
+                  present : [day.lectureDate.getDate()],
+                  absent : [],
+                }
+              }
+            }
+          })
+          //Enter the dates for which the student was absent in the object to be returned
+          absentDays.forEach((day) => {
+            const year = day.lectureDate.getFullYear();
+            const month = (day.lectureDate.getMonth()) +1;
+            if(attendanceRecord.hasOwnProperty(year))
+            {
+                if(attendanceRecord[year].hasOwnProperty(month))
+                {
+                  attendanceRecord[year][month]["absent"].push(day.lectureDate.getDate());
+                }
+                else{
+                  attendanceRecord[year][month] = {
+                  present : [],
+                  absent : [day.lectureDate.getDate()],
+                  }
+                }
+            }
+            else
+            {
+              attendanceRecord[year] = {
+                [month] : {
+                  present : [],
+                  absent : [day.lectureDate.getDate()],
+                }
+              }
+            }
+          })
+          return attendanceRecord;
+      }).catch((err) => {
+        console.log("Error in second student function " + err);
+      })
+    }).catch((err) => {
+      console.log("Error in first student function " + err);
+    })
+    }
+    //if account type is teacher
+    else
+    {
+      //fetch the days for which teacher took the lecture
+      return getTeacherAttendanceFromDB(courseID,userID).then((attendance) => {
+        attendance.forEach((day) => {
+          const year = day.lectureDate.getFullYear();
+          const month = (day.lectureDate.getMonth()) +1;
+          if(attendanceRecord.hasOwnProperty(year))
+          {
+              if(attendanceRecord[year].hasOwnProperty(month))
+              {
+                attendanceRecord[year][month]["present"].push(day.lectureDate.getDate());
+              }
+              else{
+                attendanceRecord[year][month] = {
+                present : [day.lectureDate.getDate()],
+                }
+              }
+          }
+          else
+          {
+            attendanceRecord[year] = {
+              [month] : {
+                present : [day.lectureDate.getDate()],
+              }
+            }
+          }
+        })
+      
+      return attendanceRecord;
+      }).catch((err) => {
+        console.log("Error in teacher function " + err);
+      })
+      
+    } 
 };
