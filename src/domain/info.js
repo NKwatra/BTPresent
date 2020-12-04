@@ -5,6 +5,7 @@ import {
   extractStudentID,
   insertStudentAttendance,
   insertClassRecord,
+  extractAttendanceFromDb,
   getAbsentRecordFromDB,
   getStudentAttendanceFromDB,
   getTeacherAttendanceFromDB
@@ -184,3 +185,19 @@ export const getPreviousAttendance = (courseID , accountType , userID) => {
       
     } 
 };
+
+export const extractAttendance= ( courseID , year, month ,day ) => {
+  const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+  const currentdateString = monthNames[month-1] + " " + day.toString() + "," + year.toString() + " 00:00:00 UTC";
+  let currentDate = new Date(currentdateString);
+  currentDate = currentDate.toISOString();
+  let nextDate = new Date(currentdateString);
+  nextDate.setDate(nextDate.getDate() + 1);
+  nextDate = nextDate.toISOString();
+  return extractAttendanceFromDb(courseID , currentDate , nextDate).then((attendance) => {
+      console.log(attendance);
+      return attendance;
+  });
+}

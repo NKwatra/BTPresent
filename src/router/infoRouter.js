@@ -4,6 +4,7 @@ import {
   getAllCourses,
   getStudentList,
   addNewAttendance,
+  extractAttendance,
   getPreviousAttendance
 } from "../domain/info";
 import passport from "passport";
@@ -45,6 +46,11 @@ router.get("/attendance", passport.authenticate("jwt", { session : false }), (re
   getPreviousAttendance( courseID , accountType , userID).then((previousAttendance) => {
     res.json(previousAttendance);
   });
+});
+
+router.get("/attendance/retreive", (req,res) => {
+  const { courseID , year , month , day } = req.query;
+  extractAttendance( courseID , year , month , day ).then((attendance) => res.json(attendance));
 });
 
 export default router;
