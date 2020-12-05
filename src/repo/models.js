@@ -56,9 +56,9 @@ const studentAttendanceSchema = new mongoose.Schema({
     ref: "course",
   },
   studentID: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "student",
+    { 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "student",
     },
   ],
 });

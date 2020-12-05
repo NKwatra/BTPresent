@@ -79,5 +79,8 @@ export const extractAttendanceFromDb = ( courseID ,currentDate, nextDate) => {
     lectureDate : { $gt : currentDate , 
                     $lt : nextDate
                   },
+  }).populate({
+    path : "studentID",
+    model : "student" 
   }).exec();
 };

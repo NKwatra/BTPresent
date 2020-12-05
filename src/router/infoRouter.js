@@ -48,7 +48,7 @@ router.get("/attendance", passport.authenticate("jwt", { session : false }), (re
   });
 });
 
-router.get("/attendance/retreive", (req,res) => {
+router.get("/attendance/get",passport.authenticate("jwt", { session : false }) ,(req,res) => {
   const { courseID , year , month , day } = req.query;
   extractAttendance( courseID , year , month , day ).then((attendance) => res.json(attendance));
 });
