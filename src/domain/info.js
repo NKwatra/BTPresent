@@ -8,7 +8,8 @@ import {
   extractAttendanceFromDb,
   getAbsentRecordFromDB,
   getStudentAttendanceFromDB,
-  getTeacherAttendanceFromDB
+  getTeacherAttendanceFromDB,
+  updateStudentAttendanceInDB
 } from "../repo/info";
 
 // extract all universities registered in database
@@ -204,4 +205,25 @@ export const extractAttendance= ( courseID , year, month ,day ) => {
   }).catch((err) => {
     console.log(err);
   });
+}
+
+export const updateStudentAttendance = (studentIdList , studentRollList , courseID , univID , year , month, day) => {
+    return extractStudentID (univID, studentRollList)
+          .then((students) => {
+            const addedStudentIds = students.map((student) => student._id);
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December" ];
+            const currentdateString = monthNames[month-1] + " " + day.toString() + "," + year.toString() + " 00:00:00 UTC";
+            let currentDate = new Date(currentdateString);
+            currentDate = currentDate.toISOString();
+            let nextDate = new Date(currentdateString);
+            nextDate.setDate(nextDate.getDate() + 1);
+            nextDate = nextDate.toISOString();
+            return updateStudentAttendanceInDB([...studentIdList , ...addedStudentIds] , courseID, currentDate,nextDate)
+            .then(() => {
+              return true;
+            })
+          }).catch(() => {
+            return false;
+          })
 }

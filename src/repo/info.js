@@ -84,3 +84,13 @@ export const extractAttendanceFromDb = ( courseID ,currentDate, nextDate) => {
     model : "student" 
   }).exec();
 };
+
+export const updateStudentAttendanceInDB = ( studentIds , courseId , currentDate , nextDate) => {
+  return StudentAttendance.findOneAndUpdate({ 
+    course : mongoose.Types.ObjectId(courseId),
+    lectureDate : { $gt : currentDate , 
+                    $lt : nextDate
+                  },
+  },{ studentID : studentIds })
+  .exec();
+};
