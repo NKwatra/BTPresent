@@ -59,7 +59,8 @@ router.get("/attendance/get",passport.authenticate("jwt", { session : false }) ,
 });
 
 router.post("/attendance/update", passport.authenticate("jwt", { session : false }) , (req,res) => {
-  const { studentIdList , studentRollList , courseID , univID , year , month , day} = req.body;
+  const { studentIdList , studentRollList , courseID  , year , month , day} = req.body;
+  const univID = req.user.univID;
   updateStudentAttendance( studentIdList , studentRollList , courseID , univID, year, month, day)
   .then((saved) => res.json(saved));
 });
