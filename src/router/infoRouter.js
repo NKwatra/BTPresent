@@ -4,7 +4,9 @@ import {
   getAllCourses,
   getStudentList,
   addNewAttendance,
-  getPreviousAttendance
+  extractAttendance,
+  getPreviousAttendance,
+  updateStudentAttendance
 } from "../domain/info";
 import passport from "passport";
 
@@ -49,6 +51,18 @@ router.get("/attendance", passport.authenticate("jwt", { session : false }), (re
   getPreviousAttendance( courseID , accountType , userID).then((previousAttendance) => {
     res.json(previousAttendance);
   });
+});
+
+router.get("/attendance/get",passport.authenticate("jwt", { session : false }) ,(req,res) => {
+  const { courseID , year , month , day } = req.query;
+  extractAttendance( courseID , year , month , day ).then((attendance) => res.json(attendance));
+});
+
+router.post("/attendance/update", passport.authenticate("jwt", { session : false }) , (req,res) => {
+  const { studentIdList , studentRollList , courseID  , year , month , day} = req.body;
+  const univID = req.user.univID;
+  updateStudentAttendance( studentIdList , studentRollList , courseID , univID, year, month, day)
+  .then((saved) => res.json(saved));
 });
 
 export default router;

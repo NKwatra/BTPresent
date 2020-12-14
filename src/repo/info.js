@@ -72,3 +72,25 @@ export const getTeacherAttendanceFromDB = ( courseID, teacherID ) => {
     teacherID : mongoose.Types.ObjectId(teacherID),
   }).then((attendance) => attendance );
 };
+
+export const extractAttendanceFromDb = ( courseID ,currentDate, nextDate) => {
+  return StudentAttendance.find({
+    course : mongoose.Types.ObjectId(courseID),
+    lectureDate : { $gt : currentDate , 
+                    $lt : nextDate
+                  },
+  }).populate({
+    path : "studentID",
+    model : "student" 
+  }).exec();
+};
+
+export const updateStudentAttendanceInDB = ( studentIds , courseId , currentDate , nextDate) => {
+  return StudentAttendance.findOneAndUpdate({ 
+    course : mongoose.Types.ObjectId(courseId),
+    lectureDate : { $gt : currentDate , 
+                    $lt : nextDate
+                  },
+  },{ studentID : studentIds })
+  .exec();
+};
