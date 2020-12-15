@@ -75,6 +75,20 @@ const teacherAttendanceSchema = new mongoose.Schema({
   },
 });
 
+const monthlyStudentAttendanceSchema = new mongoose.Schema({
+  year : Number,
+  month : Number,
+  studentID : {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "student",
+  },
+  univID : {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "university",
+  },
+  attendance : Number,
+});
+
 export const University = mongoose.model("university", universitySchema);
 export const Course = mongoose.model("course", courseSchema);
 export const Student = mongoose.model("student", studentSchema);
@@ -86,4 +100,8 @@ export const StudentAttendance = mongoose.model(
 export const TeacherAttendance = mongoose.model(
   "teacherAttendance",
   teacherAttendanceSchema
+);
+export const MonthlyStudentAttendance = mongoose.model(
+  "monthlyStudentAttendance",
+  monthlyStudentAttendanceSchema
 );
