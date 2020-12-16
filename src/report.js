@@ -1,5 +1,9 @@
-import { Student , MonthlyStudentAttendance } from "./repo/models";
-import { getPreviousAttendance } from "./domain/info";
+const DomainFunction = require("./domain/info");
+const Models = require("./repo/models");
+
+const getPreviousAttendance = DomainFunction.getPreviousAttendance;
+const Student = Models.Student;
+const MonthlyStudentAttendance = Models.MonthlyStudentAttendance;
 
 const storeInDb = (present,absent,studentID,univID, year,month) => {
         let attendance = (present/(present + absent))*100;
@@ -11,7 +15,7 @@ const storeInDb = (present,absent,studentID,univID, year,month) => {
         })
 }
 
-export const report = () => {
+const report = () => {
     //create a date object to get the current year and month
     let dateToday = new Date();
     const year = dateToday.getFullYear();
