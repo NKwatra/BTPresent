@@ -7,6 +7,19 @@ const RepoFunction = require("./repo/info");
 const MonthlyStudentAttendance = Models.MonthlyStudentAttendance;
 const getUniversitiesFromDb = RepoFunction.getUniversitiesFromDb;
 
+mongoose.connect(process.env.CLUSTER_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+  });
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", () => {
+  console.log("we're connected!");
+  sendpdf();
+});
+
 const getAttendance = (universityID , year , month) => {
     return MonthlyStudentAttendance.find({
         univID : mongoose.Types.ObjectId(universityID),
@@ -134,7 +147,10 @@ const sendpdf = () => {
             getAttendance(university._id,year,month)
             .then((attendance) =>{
                 makepdfs(attendance,year,month,university._id);
+                db.close();
             })
         });
     })
 }
+
+
