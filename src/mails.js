@@ -30,13 +30,41 @@ const readPdf = (path) => {
   });
 };
 
-const sendEmails = (id, year, month, name) => {
-  console.log("called for", id);
+const db = mongoose.connection;
+
+db.on("error", (err) => console.log("Failed with error ", err));
+db.once("open", () => {
+  getAllUniversities()
+    .then((universities) => {
+      if (universities.length > 0) {
+        let today = new Date();
+        let year = today.getFullYear();
+        let month = today.getMonth();
+        let id;
+        for (let i = 0; i < universities.length; i++) {
+          id = universities[i].id;
+          sendEmails(
+            id,
+            year,
+            month,
+            universities[i].name,
+            i === universities.length - 1
+          );
+        }
+      }
+    })
+    .catch((err) => console.log(err));
+});
+
+const sendEmails = (id, year, month, name, isLast) => {
   Student.find({ univID: mongoose.Types.ObjectId(id) })
     .then((students) => {
       if (students.length > 0) {
         readPdf(
-          `${__dirname}/attendance/${monthNames[month]}_${year}_${id}.pdf`
+          path.resolve(
+            __dirname,
+            `../attendance/${monthNames[month]}_${year}_${id}.pdf`
+          )
         )
           .then((data) => {
             console.log("file read");
@@ -66,6 +94,7 @@ const sendEmails = (id, year, month, name) => {
           })
           .catch((err) => console.log(err));
       }
+      if (isLast) db.close();
     })
     .catch();
 };
@@ -73,23 +102,4 @@ const sendEmails = (id, year, month, name) => {
 mongoose.connect(process.env.CLUSTER_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
-mongoose.connection.on("error", (err) =>
-  console.log("Failed with error ", err)
-);
-mongoose.connection.once("open", () => {
-  getAllUniversities()
-    .then((universities) => {
-      if (universities.length > 0) {
-        let today = new Date();
-        let year = today.getFullYear();
-        let month = today.getMonth();
-        let id;
-        for (let i = 0; i < universities.length; i++) {
-          id = universities[i].id;
-          sendEmails(id, year, month, universities[i].name);
-        }
-      }
-    })
-    .catch((err) => console.log(err));
 });
