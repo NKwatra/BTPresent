@@ -1,8 +1,11 @@
 const sendGrid = require("@sendgrid/mail");
 const fs = require("fs");
+const path = require("path");
 const mongoose = require("mongoose");
-const { getAllUniversities } = require("./lib/domain/info");
-const { Student } = require("./lib/repo/models");
+const { getAllUniversities } = require("./domain/info");
+const { Student } = require("./repo/models");
+const { report } = require("./report");
+const { sendpdf } = require("./sendpdf");
 
 const monthNames = [
   "January",
@@ -34,30 +37,34 @@ const db = mongoose.connection;
 
 db.on("error", (err) => console.log("Failed with error ", err));
 db.once("open", () => {
-  getAllUniversities()
-    .then((universities) => {
-      if (universities.length > 0) {
-        let today = new Date();
-        let year = today.getFullYear();
-        let month = today.getMonth();
-        let id;
-        for (let i = 0; i < universities.length; i++) {
-          id = universities[i].id;
-          sendEmails(
-            id,
-            year,
-            month,
-            universities[i].name,
-            i === universities.length - 1
-          );
-        }
-      }
-    })
-    .catch((err) => console.log(err));
+  // console.log(sendPdf);
+  report()
+    .then(() => sendpdf())
+    .then(() => {
+      getAllUniversities()
+        .then((universities) => {
+          let promises = [];
+          if (universities.length > 0) {
+            let today = new Date();
+            let year = today.getFullYear();
+            let month = today.getMonth();
+            let id;
+            for (let i = 0; i < universities.length; i++) {
+              id = universities[i].id;
+              promises.push(sendEmails(id, year, month, universities[i].name));
+            }
+          }
+          Promise.all(promises).then((results) => {
+            console.log("all resolved", results);
+            db.close();
+          });
+        })
+        .catch((err) => console.log(err));
+    });
 });
 
 const sendEmails = (id, year, month, name, isLast) => {
-  Student.find({ univID: mongoose.Types.ObjectId(id) })
+  return Student.find({ univID: mongoose.Types.ObjectId(id) })
     .then((students) => {
       if (students.length > 0) {
         readPdf(
@@ -89,12 +96,13 @@ const sendEmails = (id, year, month, name, isLast) => {
 
             sendGrid
               .send(msg)
-              .then(() => console.log("successfull sent mail"))
+              .then(() => {
+                console.log("successfull sent mail");
+              })
               .catch((err) => console.log(err));
           })
           .catch((err) => console.log(err));
       }
-      if (isLast) db.close();
     })
     .catch();
 };
