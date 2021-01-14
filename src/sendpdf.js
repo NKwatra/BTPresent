@@ -82,21 +82,22 @@ const table = (data, columns) => {
   };
 };
 
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 const makeString = (year, month) => {
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
   const message =
     "The following is the list of students with their attendance less than 60% for the month of " +
     monthNames[month - 1] +
@@ -148,7 +149,9 @@ const makepdfs = (attendance, year, month, id) => {
   };
   const pdfDoc = printer.createPdfKitDocument(docDefinition);
   pdfDoc.pipe(
-    fs.createWriteStream("attendance/" + year + "_" + month + "_" + id + ".pdf")
+    fs.createWriteStream(
+      "attendance/" + monthNames[month - 1] + "_" + year + "_" + id + ".pdf"
+    )
   );
   pdfDoc.end();
 };
